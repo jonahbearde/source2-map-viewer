@@ -18,14 +18,14 @@ async function render(map: string) {
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
   camera.position.x = 0
   camera.position.y = 0
-  camera.position.z = 12000
+  camera.position.z = 10000
 
   camera.lookAt(0, 0, 0)
 
   const controls = new FlyControls(camera, renderer.domElement)
 
-  controls.rollSpeed = 0.02
-  controls.movementSpeed = 100
+  controls.rollSpeed = 0.005
+  controls.movementSpeed = 50
   controls.dragToLook = true
 
   const scene = new THREE.Scene()
@@ -50,14 +50,16 @@ async function render(map: string) {
   const loader = new GLTFLoader()
 
   loader.load(
-    `/maps/${map}/${map}.glb`,
+    `/maps/test/test.glb`,
     function (gltf) {
       const model = gltf.scene
-      
+
       model.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
       model.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), Math.PI / 2)
 
-      model.scale.set(40, 40, 40)
+      const scale = 1 / 0.0254
+
+      model.scale.set(scale, scale, scale)
       scene.add(model)
     },
     function (xhr) {
@@ -98,4 +100,4 @@ async function render(map: string) {
   requestAnimationFrame(render)
 }
 
-render('kz_ltt')
+render("kz_ltt")
