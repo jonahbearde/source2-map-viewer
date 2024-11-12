@@ -141,7 +141,7 @@ export function read(buffer: ArrayBuffer) {
         replayData.tickDataArray.push(tickData)
       }
 
-      console.log(replayData)
+      return replayData
     }
   } catch (error) {
     console.log(error)
