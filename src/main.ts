@@ -2,6 +2,7 @@ import * as THREE from "three"
 import { FlyControls } from "three/examples/jsm/Addons.js"
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 import { read, fetchReplay } from "./reader"
+import type { ReplayData } from "./types"
 import { transformVector } from "./calc"
 
 async function renderMap(map: string) {
@@ -9,7 +10,7 @@ async function renderMap(map: string) {
 
   if (!buffer) return
 
-  const replayData = read(buffer)
+  const replayData = read(buffer) as ReplayData
 
   const renderer = new THREE.WebGLRenderer({ antialias: true })
   renderer.setSize(window.innerWidth, window.innerHeight)
@@ -75,52 +76,39 @@ async function renderMap(map: string) {
     }
   )
 
-  function resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer) {
-    const canvas = renderer.domElement
-    const width = canvas.clientWidth
-    const height = canvas.clientHeight
-    const needResize = canvas.width !== width || canvas.height !== height
-    if (needResize) {
-      renderer.setSize(width, height, false)
-    }
-
-    return needResize
-  }
-
   let currentTick = 0
+  const tickCount = replayData.tickDataArray.length
 
   function render() {
-    if (resizeRendererToDisplaySize(renderer)) {
-      const canvas = renderer.domElement
-      camera.aspect = canvas.clientWidth / canvas.clientHeight
-      camera.updateProjectionMatrix()
-    }
-
     controls.update(1)
 
-    const { position, angles } = replayData!.tickDataArray[currentTick]
+    if (currentTick < tickCount) {
+      const { position, angles } = replayData.tickDataArray[currentTick]
 
-    camera.position.set(position.x, position.y, position.z)
+      camera.position.set(position.x, position.y, position.z)
 
-    const vec = [0, 1, 0]
-    const yaw = angles.y * (Math.PI / 180)
-    const pitch = angles.x * (Math.PI / 180)
+      const vec = [0, 1, 0]
+      const yaw = angles.y * (Math.PI / 180)
+      const pitch = angles.x * (Math.PI / 180)
 
-    const lookAt = transformVector(yaw, pitch, vec)
-    const realLookAt = { x: lookAt[0] + position.x, y: lookAt[1] + position.y, z: lookAt[2] + position.z }
+      const lookAt = transformVector(yaw, pitch, vec)
+      const realLookAt = {
+        x: lookAt[0] + position.x,
+        y: lookAt[1] + position.y,
+        z: lookAt[2] + position.z,
+      }
 
-    camera.lookAt(realLookAt.x, realLookAt.y, realLookAt.z)
+      camera.lookAt(realLookAt.x, realLookAt.y, realLookAt.z)
 
-    currentTick++
+      currentTick++
 
-    renderer.render(scene, camera)
+      renderer.render(scene, camera)
 
-    requestAnimationFrame(render)
+      requestAnimationFrame(render)
+    }
   }
 
-  if (replayData && replayData.tickDataArray.length > 0) {
-    requestAnimationFrame(render)
-  }
+  requestAnimationFrame(render)
 }
 
-renderMap("kz_test")
+renderMap("test")
