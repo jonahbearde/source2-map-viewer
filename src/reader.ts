@@ -55,10 +55,8 @@ class ReplayReader {
   }
 }
 
-export async function read(map: string, replayName: string) {
+export function read(buffer: ArrayBuffer) {
   try {
-    const buffer = await fetchReplay(map, replayName)
-
     if (buffer) {
       const reader = new ReplayReader(buffer)
 
@@ -150,9 +148,9 @@ export async function read(map: string, replayName: string) {
   }
 }
 
-async function fetchReplay(map: string, name: string) {
+export async function fetchReplay(map: string, replayName: string) {
   try {
-    const response = await fetch(`/replays/${map}/${name}.replay`)
+    const response = await fetch(`${import.meta.env.VITE_RESOURCE_BASE_URL}/replays/${map}/${replayName}.replay`)
 
     const buffer = await response.arrayBuffer()
 

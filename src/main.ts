@@ -1,10 +1,14 @@
 import * as THREE from "three"
 import { FlyControls } from "three/examples/jsm/Addons.js"
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
-import { read } from "./reader"
+import { read, fetchReplay } from "./reader"
 
 async function render(map: string) {
-  await read(map, "0_KZT_NRM_NUB")
+  const buffer = await fetchReplay(map, "0_KZT_NRM_NUB");
+
+  if(!buffer) return 
+
+  read(buffer)
 
   const renderer = new THREE.WebGLRenderer({ antialias: true })
   renderer.setSize(window.innerWidth, window.innerHeight)
@@ -50,7 +54,7 @@ async function render(map: string) {
   const loader = new GLTFLoader()
 
   loader.load(
-    `/maps/test/test.glb`,
+    `${import.meta.env.VITE_RESOURCE_BASE_URL}/maps/${map}/${map}.glb`,
     function (gltf) {
       const model = gltf.scene
 
