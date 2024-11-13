@@ -67,3 +67,4 @@ export function transformVector(yaw: number, pitch: number, vector: number[]): n
 
   return applyTransformation(Rfinal, vector)
 }
+

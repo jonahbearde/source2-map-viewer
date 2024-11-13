@@ -87,25 +87,27 @@ async function renderMap(map: string) {
 
       camera.position.set(position.x, position.y, position.z)
 
-      const vec = [0, 1, 0]
       const yaw = angles.y * (Math.PI / 180)
       const pitch = angles.x * (Math.PI / 180)
 
-      const lookAt = transformVector(yaw, pitch, vec)
-      const realLookAt = {
-        x: lookAt[0] + position.x,
-        y: lookAt[1] + position.y,
-        z: lookAt[2] + position.z,
-      }
+      const lookAt = [0, 0, 0]
 
-      camera.lookAt(realLookAt.x, realLookAt.y, realLookAt.z)
+      lookAt[0] = Math.cos(yaw) * Math.cos(pitch)
+      lookAt[1] = -Math.sin(yaw) * Math.cos(yaw)
+      lookAt[2] = -Math.sin(pitch)
+
+      const realLookAt = [lookAt[0] + position.x, lookAt[1] + position.y, lookAt[2] + position.z]
+
+      // console.log(position, lookAt, realLookAt)
+
+      camera.lookAt(realLookAt[0], realLookAt[1], realLookAt[2])
 
       currentTick++
-
-      renderer.render(scene, camera)
-
-      requestAnimationFrame(render)
     }
+
+    renderer.render(scene, camera)
+
+    requestAnimationFrame(render)
   }
 
   requestAnimationFrame(render)
